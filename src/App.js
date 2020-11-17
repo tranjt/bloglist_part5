@@ -68,12 +68,30 @@ const App = () => {
     blogService.setToken(null)
   }
 
-  const createBlog = async (newBlog) => {
+  const createBlog = (newBlog) => {
     blogService
-      .create(newBlog).then(returnedBlog => {
+      .create(newBlog)
+      .then(returnedBlog => {
         blogFormRef.current.toggleVisibility()
         setBlogs(blogs.concat(returnedBlog))
         displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')
+      }).catch(error => {
+        displayErrorMessage(error.response.data.error, "error")
+      })
+  }
+
+  const updateBlogs = (id, newObject) => {
+    const blogIndex = blogs.findIndex(blog => blog.id === id)
+    const newBlogList = [...blogs]
+    newBlogList[blogIndex] = { ...newBlogList[blogIndex], likes: newObject.likes }
+    setBlogs(newBlogList)
+  }
+
+  const updateBlog = (id, updatedBlog) => {
+    blogService
+      .update(id, updatedBlog)
+      .then(returnedBlog => {
+        updateBlogs(id, returnedBlog)
       }).catch(error => {
         displayErrorMessage(error.response.data.error, "error")
       })
@@ -105,7 +123,7 @@ const App = () => {
       </Togglable>
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
       )}
     </div>
   )
