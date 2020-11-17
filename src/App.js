@@ -5,6 +5,7 @@ import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import ErrorMessage from './components/ErrorMessage'
+import Togglable from './components/Togglable'
 
 
 const App = () => {
@@ -13,6 +14,8 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState({ text: null, classname: '' })
+
+  const blogFormRef = React.createRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -65,11 +68,15 @@ const App = () => {
     blogService.setToken(null)
   }
 
-  const createBlog = (newBlog) => {
+  const createBlog = async (newBlog) => {
+    
     blogService
       .create(newBlog).then(returnedBlog => {
+        blogFormRef.current.toggleVisibility()
         setBlogs(blogs.concat(returnedBlog))
-        displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')
+        displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')        
+      }).catch(error => {
+        displayErrorMessage(error.response.data.error, "error")
       })
   }
 
@@ -94,7 +101,9 @@ const App = () => {
       <h2>Blogs</h2>
       <ErrorMessage message={errorMessage} />
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-      <BlogForm createBlog={createBlog} />
+      <Togglable buttonLabel='New blog' ref={blogFormRef}>
+        <BlogForm createBlog={createBlog} />
+      </Togglable>
 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
