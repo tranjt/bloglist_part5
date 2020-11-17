@@ -69,12 +69,11 @@ const App = () => {
   }
 
   const createBlog = async (newBlog) => {
-    
     blogService
       .create(newBlog).then(returnedBlog => {
         blogFormRef.current.toggleVisibility()
         setBlogs(blogs.concat(returnedBlog))
-        displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')        
+        displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')
       }).catch(error => {
         displayErrorMessage(error.response.data.error, "error")
       })
