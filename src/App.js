@@ -17,9 +17,13 @@ const App = () => {
 
   const blogFormRef = React.createRef()
 
+  const sortByLikes = blogs => {
+    return blogs.sort((a, b) => b.likes - a.likes)
+  }
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs(blogs)
+      setBlogs(sortByLikes(blogs))
     )
   }, [])
 
@@ -73,7 +77,8 @@ const App = () => {
       .create(newBlog)
       .then(returnedBlog => {
         blogFormRef.current.toggleVisibility()
-        setBlogs(blogs.concat(returnedBlog))
+        const sortedBlogs = sortByLikes(blogs.concat(returnedBlog))
+        setBlogs(sortedBlogs)
         displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')
       }).catch(error => {
         displayErrorMessage(error.response.data.error, "error")
@@ -84,7 +89,7 @@ const App = () => {
     const blogIndex = blogs.findIndex(blog => blog.id === id)
     const newBlogList = [...blogs]
     newBlogList[blogIndex] = { ...newBlogList[blogIndex], likes: newObject.likes }
-    setBlogs(newBlogList)
+    setBlogs(sortByLikes(newBlogList))
   }
 
   const updateBlog = (id, updatedBlog) => {
