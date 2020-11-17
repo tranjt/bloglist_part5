@@ -4,12 +4,15 @@ import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import ErrorMessage from './components/ErrorMessage'
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [errorMessage, setErrorMessage] = useState({ text: null, classname: '' })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -18,13 +21,20 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
     }
   }, [])
+
+  const displayErrorMessage = (text, errorType) => {
+    setErrorMessage({ text, classname: errorType })
+    setTimeout(() => {
+      setErrorMessage({ text: null, classname: '' })
+    }, 5000)
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -33,22 +43,24 @@ const App = () => {
       const user = await loginService.login({
         username, password
       })
-      
+
       window.localStorage.setItem(
-        'loggedNoteappUser', JSON.stringify(user)
+        'loggedBlogappUser', JSON.stringify(user)
       )
 
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
-    } catch (exception) {
-      console.log('wrong credentials')
+      displayErrorMessage(`${user.name} logged in`, 'success')
+    } catch (error) {
+      displayErrorMessage(error.response.data.error, 'error')
     }
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedNoteappUser')
+    displayErrorMessage(`${user.name} logged out`, 'success')
+    window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
     blogService.setToken(null)
   }
@@ -57,24 +69,30 @@ const App = () => {
     blogService
       .create(newBlog).then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
+        displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')
       })
   }
 
   if (user === null) {
     return (
-      <LoginForm
-        username={username}
-        password={password}
-        handleUsernameChange={({ target }) => setUsername(target.value)}
-        handlePasswordChange={({ target }) => setPassword(target.value)}
-        handleSubmit={handleLogin}
-      />
+      <div>
+        <h2>Log in to application</h2>
+        <ErrorMessage message={errorMessage} />
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        />
+      </div>
     )
   }
 
   return (
     <div>
-      <h2>blogs</h2>
+      <h2>Blogs</h2>
+      <ErrorMessage message={errorMessage} />
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
       <BlogForm createBlog={createBlog} />
 
