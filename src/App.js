@@ -79,9 +79,9 @@ const App = () => {
         blogFormRef.current.toggleVisibility()
         const sortedBlogs = sortByLikes(blogs.concat(returnedBlog))
         setBlogs(sortedBlogs)
-        displayErrorMessage(`A new blog "${newBlog.title}" by ${newBlog.author} added`, 'success')
+        displayErrorMessage(`A new blog '${newBlog.title}' by ${newBlog.author} added`, 'success')
       }).catch(error => {
-        displayErrorMessage(error.response.data.error, "error")
+        displayErrorMessage(error.response.data.error, 'error')
       })
   }
 
@@ -98,21 +98,21 @@ const App = () => {
       .then(returnedBlog => {
         updateBlogs(id, returnedBlog)
       }).catch(error => {
-        displayErrorMessage(error.response.data.error, "error")
+        displayErrorMessage(error.response.data.error, 'error')
       })
   }
 
 
   const removeBlog = (delBlog) => {
-    if (window.confirm(`Delete "${delBlog.title}" by ${delBlog.author}?`)) {
+    if (window.confirm(`Delete '${delBlog.title}' by ${delBlog.author}?`)) {
       blogService.remove(delBlog.id)
-        .then(reps => {
+        .then(() => {
           const newBlogs = blogs.filter(blog => blog.id !== delBlog.id)
           setBlogs(newBlogs)
-          displayErrorMessage(`Blog "${delBlog.title}" by ${delBlog.author} deleted`, 'success')
+          displayErrorMessage(`Blog '${delBlog.title}' by ${delBlog.author} deleted`, 'success')
 
         }).catch(error => {
-          displayErrorMessage(error.response.data.error, "error")
+          displayErrorMessage(error.response.data.error, 'error')
         })
 
     }
