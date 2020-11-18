@@ -46,5 +46,4 @@ const Blog = ({ blog, updateBlog, removeBlog }) => {
 }
 
 
-
 export default Blog
