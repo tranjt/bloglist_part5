@@ -102,6 +102,22 @@ const App = () => {
       })
   }
 
+
+  const removeBlog = (delBlog) => {
+    if (window.confirm(`Delete "${delBlog.title}" by ${delBlog.author}?`)) {
+      blogService.remove(delBlog.id)
+        .then(reps => {
+          const newBlogs = blogs.filter(blog => blog.id !== delBlog.id)
+          setBlogs(newBlogs)
+          displayErrorMessage(`Blog "${delBlog.title}" by ${delBlog.author} deleted`, 'success')
+
+        }).catch(error => {
+          displayErrorMessage(error.response.data.error, "error")
+        })
+
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -128,7 +144,7 @@ const App = () => {
       </Togglable>
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} removeBlog={removeBlog} />
       )}
     </div>
   )

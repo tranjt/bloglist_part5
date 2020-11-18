@@ -18,4 +18,14 @@
   margin-bottom: 10px;
 }
 
+.deleteButtonStyle {
+  background: red;
+  color: white;       
+  border: none;
+  cursor: pointer;   
+  opacity: 0.9;
+  padding: 5px;
+  margin-Bottom: 10px;
+}
+
 
