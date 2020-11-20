@@ -58,7 +58,7 @@ describe('Blog app', function () {
       cy.contains('www.test.fi')
     })
 
-    describe('and a note exists', function () {
+    describe('and a blog exists', function () {
       beforeEach(function () {
         cy.createBlog({ title: 'first blog', author: 'newbie yksi', url: 'www.firstblog.fi' })
         cy.createBlog({ title: 'second blog', author: 'newbie kaksi', url: 'www.secondblog.fi' })
@@ -79,6 +79,32 @@ describe('Blog app', function () {
     })
   })
 
+  describe.only('When logged in and blogs exist', function () {
+    beforeEach(function () {
+      cy.login({ username: 'root', password: 'sekret' })
+
+      cy.createBlog({ title: 'first blog', author: 'newbie yksi', url: 'www.firstblog.fi', likes: 10 })
+      cy.createBlog({ title: 'second blog', author: 'newbie kaksi', url: 'www.secondblog.fi', likes: 100 })
+      cy.createBlog({ title: 'third blog', author: 'newbie kolme', url: 'www.thirdblog.fi' })
+      cy.createBlog({ title: 'forth blog', author: 'newbie neljä', url: 'www.forthblog.fi', likes: 1002 })
+      cy.createBlog({ title: 'fifth blog', author: 'newbie viisi', url: 'www.fifthblog.fi', likes: 80 })
+    })
+
+    it('blogs are sorted by like', function () {
+      cy.get('p#like').invoke('text').then(likes => {
+        const likeList = likes
+          .replaceAll('like', '')
+          .trim()
+          .split(' ')
+          .map(function (i) {
+            return parseInt(i, 10)
+          })
+        const likeListSorted = likeList.sort((a, b) => b - a)
+
+        expect(likeList.toString()).to.equal(likeListSorted.toString())
+      })
+    })
+  })
 })
 
 
