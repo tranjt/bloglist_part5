@@ -57,8 +57,27 @@ describe('Blog app', function () {
       cy.contains('newbie tester')
       cy.contains('www.test.fi')
     })
-  })
 
+    describe('and a note exists', function () {
+      beforeEach(function () {
+        cy.createBlog({ title: 'first blog', author: 'newbie yksi', url: 'www.firstblog.fi' })
+        cy.createBlog({ title: 'second blog', author: 'newbie kaksi', url: 'www.secondblog.fi' })
+        cy.createBlog({ title: 'third blog', author: 'newbie kolme', url: 'www.thirdblog.fi' })
+      })
+
+      it('user can like a blog', function () {
+        cy.contains('second blog').find('#viewButton').click()
+        cy.contains('second blog').should('contain', '0 like')
+        cy.contains('second blog').find('#likeButton').click()
+        cy.contains('second blog').should('contain', '1 like')
+      })
+
+      it('user can delete a blog', function () {
+        cy.contains('third blog').contains('view').click()
+        cy.contains('third blog').contains('delete').click()
+      })
+    })
+  })
 
 })
 
